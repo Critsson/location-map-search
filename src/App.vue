@@ -2,7 +2,7 @@
 import LocationButton from "./components/LocationButton.vue";
 import Searchbar from "./components/Searchbar.vue";
 import DataTable from "./components/DataTable.vue";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const mapDiv = ref(null);
 const searchedPlaces = ref(
@@ -11,7 +11,25 @@ const searchedPlaces = ref(
     : []
 );
 let map;
+const paginatedSearchedPlaces = computed(() => {
+  const placeholder = [];
+  let arr = [];
+  for (let i = 0; i < searchedPlaces.value.length; i++) {
+    arr.push(searchedPlaces.value[i]);
+    if ((i + 1) % 10 === 0) {
+      placeholder.push([...arr]);
+      arr = [];
+    }
+  }
+  if (arr.length < 10) {
+    placeholder.push([...arr]);
+    arr = [];
+  }
+  return placeholder;
+});
 const searchedPlacesMarkers = ref({});
+
+console.log(paginatedSearchedPlaces.value);
 
 const addCurrentLocation = async (coords) => {
   const { Marker, Animation } = await google.maps.importLibrary("marker");
@@ -23,7 +41,7 @@ const addCurrentLocation = async (coords) => {
     animation: Animation.DROP,
     title: "Current Location",
   });
-  map.setCenter(results[0].geometry.location);
+  map.setCenter(coords);
   map.setZoom(10);
 };
 
@@ -46,6 +64,24 @@ onMounted(async () => {
     });
   }
 });
+
+const handleDelete = async (multipleSelection) => {
+  console.log(multipleSelection);
+  for (let i = 0; i < multipleSelection.length; i++) {
+    searchedPlaces.value = searchedPlaces.value.filter(
+      (place) => place.name !== multipleSelection[i].name
+    );
+    localStorage.setItem(
+      "searchedPlaces",
+      JSON.stringify(searchedPlaces.value)
+    );
+    let marker = searchedPlacesMarkers.value[multipleSelection[i].name];
+    marker.setVisible(false);
+    marker.setMap(null);
+    marker = null;
+    searchedPlacesMarkers.value[multipleSelection[i].name] = null;
+  }
+};
 
 const handleSearch = async (searchTerm) => {
   const { PlacesService } = await google.maps.importLibrary("places");
@@ -87,11 +123,17 @@ const handleSearch = async (searchTerm) => {
   <div class="main-container">
     <LocationButton @get-location="(coords) => addCurrentLocation(coords)" />
     <Searchbar @search="(searchTerm) => handleSearch(searchTerm)" />
-    <div
-      ref="mapDiv"
-      style="width: 40vw; height: 60vh; border-radius: 1vw"
-    ></div>
-    <DataTable :searchedPlaces="searchedPlaces" />
+    <div class="map-table-container">
+      <div
+        ref="mapDiv"
+        style="width: 45vw; height: 500px; border-radius: 1vw"
+      ></div>
+      <DataTable
+        :searchedPlaces="searchedPlaces"
+        :paginated="paginatedSearchedPlaces"
+        @delete="(multipleSelection) => handleDelete(multipleSelection)"
+      />
+    </div>
   </div>
 </template>
 
@@ -103,5 +145,12 @@ const handleSearch = async (searchTerm) => {
   align-items: center;
   gap: 30px;
   width: 100vw;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+.map-table-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 </style>
