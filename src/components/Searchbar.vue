@@ -12,7 +12,7 @@
 
 <script setup>
 import { Search } from "@element-plus/icons-vue";
-import { ref, watchEffect } from "vue";
+import { ref } from "vue";
 
 const emit = defineEmits(["search"]);
 
@@ -22,10 +22,6 @@ const onSearch = async () => {
   emit("search", searchTerm.value);
   searchTerm.value = "";
 };
-
-watchEffect(() => {
-  console.log(searchTerm.value);
-});
 </script>
 
 <style scoped>
