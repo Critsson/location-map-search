@@ -1,7 +1,9 @@
-# Vue 3 + Vite
+# Accuenergy Vue Applcation
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This Vue application allows for users to acquire their current location, search for any location and add a marker to a map, and look at their past search history through a table.
 
-## Recommended IDE Setup
+# How to Run
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+1. Run `npm install` in the root directory
+2. Run `npm run dev` in the root directory
+3. Voila!
